@@ -50,7 +50,7 @@ string Operation::get_loop_increment_decrement_string(string loop_string) { //fo
 	first++;
 	return loop_string.substr(first, last - first);
 }
-void Operation::change_loop() {
+void Operation::change_loop() { //change the loop 
 
 }
 void Operation::begin() {
