@@ -50,15 +50,82 @@ string Operation::get_loop_increment_decrement_string(string loop_string) { //fo
 	first++;
 	return loop_string.substr(first, last - first);
 }
+/*
+* std::ifstream infile("thefile.txt");
+int a, b;
+while (infile >> a >> b)
+{
+	// process pair (a,b)
+}
+*/
+int Operation::find_loop_body_length() {
+	ifstream file("code.txt");
+	loop_line = find_loop_line("for");
+	int allowed = 0;
+	int length = 0;
+	int curLine = 0;
+	string line;
+	while (getline(file, line)) {
+		curLine++;
+		if (curLine > loop_line) {
+			length++;
+			cout << line<<endl;
+			if (line.find("{") != std::string::npos) {
+				allowed++;
+			}
+			if (line.find("}") != std::string::npos) {
+				if (allowed==0) {
+					return length;
+				}
+				allowed--;
+			}
+		}		
+	}
+}
 void Operation::change_loop() { //change the loop 
+	loop_length = find_loop_body_length();
+	loop_string = get_loop_string(loop_line);
+	loop_line = find_loop_line("for");
+	ifstream file("code.txt");
+	ofstream myfile("temp.txt");
+	int tab_space_count = 8;
+	char space = loop_string[0];
+	
+	if (loop_string.find("{") != std::string::npos) {
+		int curLine = 0;
+		string line;
 
+		while (getline(file, line)) {
+			curLine++;
+			if (curLine > loop_line-1&&curLine<loop_line+loop_length) {
+				myfile <<space<< get_loop_initialization_string(loop_string)<<";"<<"\n";
+				myfile	<<space << "while("<<get_loop_condition_string(loop_string)<<"){"<<"\n";
+				while (getline(file, line)) {
+					curLine++;
+					if (curLine > loop_line + loop_length-1) break;
+					myfile << line << "\n";					
+				}
+				for (int i = 0; i < tab_space_count; i++)
+				{
+					myfile << " ";
+				}
+				myfile <<space<< get_loop_increment_decrement_string(loop_string)<<";"<<"\n"<<space<<"}" << "\n";
+
+			}
+			else {
+				myfile << line<<"\n";
+				
+			}
+		}
+		myfile.close();
+
+	}
+	else {
+
+	}
 }
 void Operation::begin() {
-	loop_line = find_loop_line("for");
-
+	change_loop();
 	if (loop_line == 0) return;
 
-	loop_string = get_loop_string(loop_line);
-	cout << loop_line << endl;
-	cout << loop_string << endl;
 }

@@ -6,7 +6,8 @@ int main(){
 	int b;
 	int x=5;
 	int y=4;
-	for(int i=0;i<5;i++){
+	int i=0;
+	while(i<5){
 		if(x==5){
 			cout<<"what"<<endl;
 			if(y==4)
@@ -15,7 +16,8 @@ int main(){
 			}
 		}
 		cout<<"test"<<endl;
-	}	
+        	i++;
+	}
 
 	return 0;
 }
