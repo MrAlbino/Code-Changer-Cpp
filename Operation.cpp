@@ -15,7 +15,7 @@ int Operation::find_loop_line(string loop_name) { //this function returns the se
 		}
 	}
 	return 0;
-	
+
 }
 string Operation::get_loop_string(int loop_line) { //this function returns loop string, sample: for(int i=0;i<5;i++) 
 	ifstream fileInput;
@@ -58,10 +58,10 @@ while (infile >> a >> b)
 	// process pair (a,b)
 }
 */
-int Operation::find_loop_body_length() {
+int Operation::find_loop_body_length(int curly_brace_count_in_loop_string) {
 	ifstream file("code.txt");
 	loop_line = find_loop_line("for");
-	int allowed = 0;
+	int allowed = curly_brace_count_in_loop_string;
 	int length = 0;
 	int curLine = 0;
 	string line;
@@ -69,59 +69,93 @@ int Operation::find_loop_body_length() {
 		curLine++;
 		if (curLine > loop_line) {
 			length++;
-			cout << line<<endl;
+			cout << line << endl;
 			if (line.find("{") != std::string::npos) {
 				allowed++;
 			}
 			if (line.find("}") != std::string::npos) {
-				if (allowed==0) {
+
+				allowed--;
+				if (allowed == 0) {
 					return length;
 				}
-				allowed--;
 			}
-		}		
+		}
 	}
 }
 void Operation::change_loop() { //change the loop 
-	loop_length = find_loop_body_length();
-	loop_string = get_loop_string(loop_line);
 	loop_line = find_loop_line("for");
+	loop_string = get_loop_string(loop_line);
+	if (loop_string.find("{") != std::string::npos) {
+		loop_length = find_loop_body_length(1);
+
+	}
+	else {
+		loop_length = find_loop_body_length(0);
+
+	}
+
 	ifstream file("code.txt");
 	ofstream myfile("temp.txt");
 	int tab_space_count = 8;
 	char space = loop_string[0];
-	
+
 	if (loop_string.find("{") != std::string::npos) {
 		int curLine = 0;
 		string line;
 
 		while (getline(file, line)) {
 			curLine++;
-			if (curLine > loop_line-1&&curLine<loop_line+loop_length) {
-				myfile <<space<< get_loop_initialization_string(loop_string)<<";"<<"\n";
-				myfile	<<space << "while("<<get_loop_condition_string(loop_string)<<"){"<<"\n";
+			if (curLine > loop_line - 1 && curLine < loop_line + loop_length) {
+				myfile << space << get_loop_initialization_string(loop_string) << ";" << "\n";
+				myfile << space << "while(" << get_loop_condition_string(loop_string) << "){" << "\n";
 				while (getline(file, line)) {
 					curLine++;
-					if (curLine > loop_line + loop_length-1) break;
-					myfile << line << "\n";					
+					if (curLine > loop_line + loop_length - 1) break;
+					myfile << line << "\n";
 				}
 				for (int i = 0; i < tab_space_count; i++)
 				{
 					myfile << " ";
 				}
-				myfile <<space<< get_loop_increment_decrement_string(loop_string)<<";"<<"\n"<<space<<"}" << "\n";
+				myfile << space << get_loop_increment_decrement_string(loop_string) << ";" << "\n" << space << "}" << "\n";
 
 			}
 			else {
-				myfile << line<<"\n";
-				
+				myfile << line << "\n";
+
 			}
 		}
 		myfile.close();
 
 	}
 	else {
+		int curLine = 0;
+		string line;
 
+		while (getline(file, line)) {
+			curLine++;
+			if (curLine > loop_line - 1 && curLine < loop_line + loop_length) {
+				myfile << space << get_loop_initialization_string(loop_string) << ";" << "\n";
+				myfile << space << "while(" << get_loop_condition_string(loop_string) << ")" << "\n";
+				while (getline(file, line)) {
+					curLine++;
+					if (curLine > loop_line + loop_length - 1) break;
+					myfile << line << "\n";
+				}
+				for (int i = 0; i < tab_space_count; i++)
+				{
+					myfile << " ";
+				}
+				myfile << space << get_loop_increment_decrement_string(loop_string) << ";" << "\n" << space << "}" << "\n";
+
+			}
+			else {
+				myfile << line << "\n";
+
+			}
+		}
+		myfile.close();
 	}
 }
 void Operation::begin() {
