@@ -5,3 +5,5 @@ There is a file named 'code.txt' in my project, if you want to change your curre
 just copy all the content and paste it into code.txt file and just run the application and it
 will give you a brand new output code. Copy it from 'code.txt' file and paste it into your own Source.cpp file
 and ready to go.
+
+*If your code generates debug file there will be an .exe file, put your .txt file in debug file where the .exe file exists.*
