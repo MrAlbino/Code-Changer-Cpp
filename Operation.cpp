@@ -187,8 +187,14 @@ void Operation::change_loop(int line_number) { //change the loop
 	myfile.close();
 	file.close();
 	remove("code.txt");
-	rename("temp.txt", "code.txt");
-
+	int result=rename("temp.txt", "code.txt");
+	
+	if (result == 0) {
+		cout << "Code successfully changed."<<endl;
+	}
+	else {
+		cout << "A problem occurs while changing the code." << endl;
+	}
 }
 int Operation::get_line_count_in_file() {
 	ifstream file("code.txt");

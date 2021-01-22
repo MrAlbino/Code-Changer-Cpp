@@ -6,8 +6,8 @@ using namespace std;
 class Operation
 {
 private:
-	int loop_line;
-	int loop_length;
+	int loop_line=0;
+	int loop_length=0;
 	string loop_string;
 public:
 	int find_loop_line(string);
