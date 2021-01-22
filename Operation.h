@@ -16,7 +16,9 @@ public:
 	string get_loop_condition_string(string);
 	string get_loop_increment_decrement_string(string);
 	int find_loop_body_length(int);
-	void change_loop();
+	void change_loop(int);
+	int get_line_count_in_file();
+	bool is_variable_exists(string,int);
 	void begin();
 };
 
