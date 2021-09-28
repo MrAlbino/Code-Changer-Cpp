@@ -85,6 +85,27 @@ int Operation::find_loop_body_length(int curly_brace_count_in_loop_string) {
 		}
 	}
 }
+string Operation::generate_new_variable_name(string old_variable_definition,string new_variable_name) {
+	string data_type = "";
+	string variable_asssignment = "";
+	string old_variable_name = extract_variable_name(old_variable_definition);
+	string delimiter = " ";
+	size_t pos = 0;
+	string token;
+
+	//get only variable name
+	while ((pos = old_variable_definition.find(delimiter)) != std::string::npos) {
+		token = old_variable_definition.substr(0, pos);
+		std::cout << token << std::endl;
+		old_variable_definition.erase(0, pos + delimiter.length());
+	}
+	data_type = token;
+	variable_asssignment = old_variable_definition;
+	cout << "Datatype:" << data_type << "  " << "Assisgnment:" << variable_asssignment <<"  "<<new_variable_name<< endl;
+	variable_asssignment.replace(0, old_variable_name.length(), new_variable_name);
+	cout << "Yeni veri:" << variable_asssignment << endl;
+	return data_type +" "+ variable_asssignment;
+}
 void Operation::change_loop(int line_number) { //change the loop 
 	loop_line = line_number;
 	loop_string = get_loop_string(loop_line);
@@ -98,6 +119,9 @@ void Operation::change_loop(int line_number) { //change the loop
 	}
 	string delimiter = " ";
 	string initialization_string = get_loop_initialization_string(loop_string);
+	string variable_name = extract_variable_name(initialization_string);
+	string new_variable = "";
+	int variable_name_counter = 1;
 	ifstream file("code.txt");
 	ofstream myfile("temp.txt");
 	int tab_space_count = 8;
@@ -110,15 +134,14 @@ void Operation::change_loop(int line_number) { //change the loop
 		while (getline(file, line)) {
 			curLine++;
 			if (curLine > loop_line - 1 && curLine < loop_line + loop_length) {
-				if (is_variable_exists(loop_string, loop_line - 1)) {
-					size_t pos = 0;
-					std::string token;
-					while ((pos = initialization_string.find(delimiter)) != std::string::npos) {
-						token = initialization_string.substr(0, pos);
-						std::cout << token << std::endl;
-						initialization_string.erase(0, pos + delimiter.length());
+				if (is_variable_exists(variable_name, loop_line - 1)) {
+					new_variable = variable_name + to_string(variable_name_counter);
+					while (is_variable_exists(new_variable, loop_line - 1)) {
+						variable_name_counter++;
+						new_variable = variable_name + to_string(variable_name_counter);
 					}
-					myfile << space << initialization_string << ";" << "\n";
+					myfile << space << generate_new_variable_name(initialization_string, new_variable) << ";" << "\n";
+					new_variable = "";
 
 				}
 				else {
@@ -147,19 +170,20 @@ void Operation::change_loop(int line_number) { //change the loop
 	else {
 		int curLine = 0;
 		string line;
-
+		initialization_string = get_loop_initialization_string(loop_string);
 		while (getline(file, line)) {
 			curLine++;
 			if (curLine > loop_line - 1 && curLine < loop_line + loop_length) {
-				if (is_variable_exists(loop_string, loop_line - 1)) {
-					size_t pos = 0;
-					std::string token;
-					while ((pos = initialization_string.find(delimiter)) != std::string::npos) {
-						token = initialization_string.substr(0, pos);
-						std::cout << token << std::endl;
-						initialization_string.erase(0, pos + delimiter.length());
+				if (is_variable_exists(variable_name, loop_line - 1)) {
+					new_variable = variable_name + to_string(variable_name_counter);
+					while (is_variable_exists(new_variable, loop_line - 1)) {
+						variable_name_counter++;
+						new_variable = variable_name + to_string(variable_name_counter);
 					}
-					myfile << space << initialization_string << ";" << "\n";
+					cout << "New Variaableee:" << new_variable << endl;
+
+					myfile << space << generate_new_variable_name(initialization_string, new_variable) << ";" << "\n";
+					new_variable = "";
 
 				}
 				else {
@@ -205,14 +229,32 @@ int Operation::get_line_count_in_file() {
 	}
 	return counter;
 }
-bool Operation::is_variable_exists(string loop_string, int line_restriction) {
-	string current_variable = get_loop_initialization_string(loop_string);
+string Operation::extract_variable_name(string initialization_string) {
+	string delimiter = " ";
+	size_t pos = 0;
+	string token;
+
+	//get only variable name
+	while ((pos = initialization_string.find(delimiter)) != std::string::npos) {
+		token = initialization_string.substr(0, pos);
+		std::cout << token << std::endl;
+		initialization_string.erase(0, pos + delimiter.length());
+	}
+	delimiter = "=";
+	while ((pos = initialization_string.find(delimiter)) != std::string::npos) {
+		token = initialization_string.substr(0, pos);
+		initialization_string.erase(0, pos + delimiter.length());
+	}
+	return token;
+}
+bool Operation::is_variable_exists(string variable_name, int line_restriction) {	
 	ifstream file("code.txt");
 	string line;
 	while (getline(file, line)) {
 		line_restriction--;
-		if (line.find(current_variable) != string::npos) {
+		if (line.find(variable_name+"=") != string::npos) {
 			file.close();
+			cout << "Buldum" << endl;
 			return true;
 		}
 		if (line_restriction == 0)break;

@@ -19,5 +19,7 @@ public:
 	void change_loop(int);
 	int get_line_count_in_file();
 	bool is_variable_exists(string, int);
+	string extract_variable_name(string);
+	string generate_new_variable_name(string,string);
 	void begin();
 };
